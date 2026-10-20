@@ -149,12 +149,15 @@ public class CadastroPanel extends JPanel {
     }
 
     private void executar(Runnable acao) {
-        try {
-            acao.run();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Informe apenas números inteiros nos campos numéricos.", "Erro", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+    try {
+        acao.run();
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Informe apenas números inteiros nos campos numéricos.", "Erro", JOptionPane.ERROR_MESSAGE);
+    } catch (Exception ex) {
+        ex.printStackTrace();   // agora o console mostra o Caused by
+        String msg = ex.getMessage();
+        if (ex.getCause() != null) msg += "\n\nMotivo: " + ex.getCause().getMessage();
+        JOptionPane.showMessageDialog(this, msg, "Erro", JOptionPane.ERROR_MESSAGE);
     }
+}
 }

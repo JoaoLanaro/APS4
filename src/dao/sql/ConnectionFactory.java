@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 
 public class ConnectionFactory {
-    private static final String URL  = "jdbc:mysql://localhost:3306/campeonato?useSSL=false&serverTimezone=UTC";
+    private static final String URL ="jdbc:mysql://localhost:3306/campeonato?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static String USER = System.getenv("DB_USER");
     private static String PASS = System.getenv("DB_PASSWORD");
 

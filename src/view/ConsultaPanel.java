@@ -115,7 +115,10 @@ public class ConsultaPanel extends JPanel {
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "O valor do filtro deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();   // agora o console mostra o Caused by
+        String msg = ex.getMessage();
+        if (ex.getCause() != null) msg += "\n\nMotivo: " + ex.getCause().getMessage();
+        JOptionPane.showMessageDialog(this, msg, "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
