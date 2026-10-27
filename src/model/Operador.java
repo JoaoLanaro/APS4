@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * MODEL - Operadores de comparacao permitidos no filtro numerico da Consulta.
+ * Lista fechada (como o ColunaView), para o operador nunca vir de texto livre.
+ */
+
 public enum Operador {
     IGUAL("="), DIFERENTE("<>"), MAIOR(">"), MAIOR_IGUAL(">="), MENOR("<"), MENOR_IGUAL("<=");
 
@@ -9,5 +14,5 @@ public enum Operador {
 
     public String getSql() { return sql; }
 
-    @Override public String toString() { return sql; }
+    @Override public String toString() { return sql; }  // mostrado no combo
 }

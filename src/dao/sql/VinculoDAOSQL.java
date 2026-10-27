@@ -6,13 +6,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO (implementacao SQL) - Acesso a relacao jogador x time.
+ *  - LEITURA: consulta a VIEW vw_jogador_time (ja faz o JOIN das 3 tabelas).
+ *  - ESCRITA: INSERT/UPDATE/DELETE direto na tabela jogador_time.
+ */
+
 public class VinculoDAOSQL implements VinculoDAO {
 
-    // A leitura usa a view (JOIN das 3 tabelas); a escrita vai direto em jogador_time
+    // SELECT base na view; os metodos de leitura acrescentam WHERE/ORDER BY
     private static final String SELECT_VIEW =
             "SELECT jogador_id, time_id, jogador_nome, time_nome, numero_camisa, partidas "
           + "FROM vw_jogador_time";
 
+    // INSERT na tabela relacional. A chave (jogador_id, time_id) nao pode se repetir.
     @Override
     public void vincular(int jogadorId, int timeId, int numeroCamisa, int partidas) {
         String sql = "INSERT INTO jogador_time (jogador_id, time_id, numero_camisa, partidas) VALUES (?,?,?,?)";
@@ -28,17 +35,20 @@ public class VinculoDAOSQL implements VinculoDAO {
         }
     }
 
+    // Todos os vinculos (lidos da view), ordenados por jogador e time.
     @Override
     public List<Vinculo> listarTodos() {
         return consultar(SELECT_VIEW + " ORDER BY jogador_nome, time_nome", null);
     }
 
+    // Vinculos em que o nome do jogador OU do time contem o texto.
     @Override
     public List<Vinculo> buscar(String texto) {
         return consultar(SELECT_VIEW + " WHERE jogador_nome LIKE ? OR time_nome LIKE ? "
                 + "ORDER BY jogador_nome, time_nome", "%" + texto + "%");
     }
 
+    // Executa o SELECT na view. Com "like" preenche os dois "?" (jogador e time).
     private List<Vinculo> consultar(String sql, String like) {
         List<Vinculo> lista = new ArrayList<>();
         try (Connection c = ConnectionFactory.getConnection();
@@ -60,6 +70,7 @@ public class VinculoDAOSQL implements VinculoDAO {
         return lista;
     }
 
+    // UPDATE de camisa e partidas. O par (jogador, time) identifica a linha e nao muda. 
     @Override
     public void atualizar(Vinculo v) {
         String sql = "UPDATE jogador_time SET numero_camisa=?, partidas=? WHERE jogador_id=? AND time_id=?";
@@ -75,6 +86,7 @@ public class VinculoDAOSQL implements VinculoDAO {
         }
     }
 
+    // DELETE do vinculo. Nao apaga o jogador nem o time, so a ligacao entre eles. 
     @Override
     public void remover(int jogadorId, int timeId) {
         try (Connection c = ConnectionFactory.getConnection();

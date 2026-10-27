@@ -6,10 +6,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO (implementacao SQL) - Acesso a tabela "time_". Mesmo padrao do JogadorDAOSQL
+ * (try-with-resources, PreparedStatement e conversao de SQLException).
+ */
+
 public class TimeDAOSQL implements TimeDAO {
 
     private static final String COLS = "id, nome, pontos, vitorias, empates, derrotas, gols_pro, gols_contra";
 
+    // Converte a linha atual do ResultSet em um objeto Time. 
     private Time map(ResultSet rs) throws SQLException {
         return new Time(rs.getInt("id"), rs.getString("nome"), rs.getInt("pontos"),
                 rs.getInt("vitorias"), rs.getInt("empates"), rs.getInt("derrotas"),
@@ -37,6 +43,7 @@ public class TimeDAOSQL implements TimeDAO {
         return buscar("SELECT " + COLS + " FROM time_ WHERE nome LIKE ? ORDER BY nome", "%" + nome + "%");
     }
 
+    // Executa um SELECT (com ou sem parametro de texto) e devolve a lista de times.
     private List<Time> buscar(String sql, String param) {
         List<Time> lista = new ArrayList<>();
         try (Connection c = ConnectionFactory.getConnection();
@@ -64,6 +71,7 @@ public class TimeDAOSQL implements TimeDAO {
         }
     }
 
+    // INSERT de um time novo. O nome e UNIQUE no banco: nome repetido gera erro.
     @Override
     public void add(Time t) {
         String sql = "INSERT INTO time_ (nome, pontos, vitorias, empates, derrotas, gols_pro, gols_contra) "
@@ -77,6 +85,7 @@ public class TimeDAOSQL implements TimeDAO {
         }
     }
 
+    // UPDATE de todos os campos do time identificado pelo id. 
     @Override
     public void atualizar(Time t) {
         String sql = "UPDATE time_ SET nome=?, pontos=?, vitorias=?, empates=?, derrotas=?, "
@@ -91,6 +100,7 @@ public class TimeDAOSQL implements TimeDAO {
         }
     }
 
+    // DELETE pelo id. Os vinculos do time somem junto (ON DELETE CASCADE no banco).
     @Override
     public void remover(int id) {
         try (Connection c = ConnectionFactory.getConnection();
