@@ -8,10 +8,18 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * VIEW - Painel de vinculos (tabela relacional jogador_time) das abas ATUALIZAR e DELETAR.
+ * A tabela mostra jogador, time, camisa e partidas (lidos da view vw_jogador_time).
+ *  - Modo ATUALIZAR: so camisa e partidas podem mudar. Jogador e time ficam bloqueados,
+ *    pois o par (jogador, time) e a chave do vinculo. Para trocar um deles: remover e criar outro.
+ *  - Modo REMOVER: tudo so de leitura; remove so a ligacao (jogador e time continuam existindo).
+ */
 public class VinculoPanel extends JPanel {
     private final VinculoController controller;
     private final Modo modo;
 
+    // Jogador e time sao so exibidos (nunca editaveis)
     private final JTextField txtJogador = new JTextField(14);
     private final JTextField txtTime = new JTextField(14);
     private final JTextField txtCamisa = new JTextField(4);
@@ -24,8 +32,10 @@ public class VinculoPanel extends JPanel {
     };
     private final JTable tabela = new JTable(modelo);
 
-    private List<Vinculo> atuais = new ArrayList<>();   // o que está na tabela, na mesma ordem
-    private Vinculo selecionado = null;
+    // A tabela nao mostra os ids; esta lista guarda os objetos na mesma ordem das linhas,
+    // para saber qual vinculo (com seus ids) corresponde a linha clicada.
+    private List<Vinculo> atuais = new ArrayList<>();   
+    private Vinculo selecionado = null;     // vinculo da linha clicada (null = nenhum)
 
     public VinculoPanel(VinculoController controller, Modo modo) {
         this.controller = controller;
@@ -34,7 +44,7 @@ public class VinculoPanel extends JPanel {
 
         txtJogador.setEditable(false);   // a chave (jogador, time) não muda
         txtTime.setEditable(false);
-        txtCamisa.setEditable(modo == Modo.ATUALIZAR);
+        txtCamisa.setEditable(modo == Modo.ATUALIZAR);      // em Deletar, so leitura
         txtPartidas.setEditable(modo == Modo.ATUALIZAR);
 
         JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -73,8 +83,10 @@ public class VinculoPanel extends JPanel {
         recarregar();
     }
 
+    /** Recarrega a tabela com todos os vinculos (chamado ao abrir a aba). */
     public void recarregar() { executar(() -> preencher(controller.listar())); }
 
+    /** UPDATE: a chave vem do vinculo selecionado; camisa e partidas vem dos campos. */
     private void atualizar() {
         exigirSelecao();
         controller.atualizar(selecionado.getJogadorId(), selecionado.getTimeId(),
@@ -82,6 +94,7 @@ public class VinculoPanel extends JPanel {
         limpar(); recarregar();
     }
 
+    /** DELETE: confirma e remove so a ligacao entre jogador e time. */
     private void remover() {
         exigirSelecao();
         int r = JOptionPane.showConfirmDialog(this,
@@ -92,6 +105,7 @@ public class VinculoPanel extends JPanel {
         limpar(); recarregar();
     }
 
+    /** Guarda a lista (para consultar ids depois) e redesenha a tabela. */
     private void preencher(List<Vinculo> lista) {
         atuais = lista;
         modelo.setRowCount(0);
@@ -99,6 +113,7 @@ public class VinculoPanel extends JPanel {
             modelo.addRow(new Object[]{v.getJogadorNome(), v.getTimeNome(), v.getNumeroCamisa(), v.getPartidas()});
     }
 
+    /** A linha clicada corresponde ao mesmo indice da lista "atuais". */
     private void selecionarLinha() {
         int linha = tabela.getSelectedRow();
         if (linha < 0 || linha >= atuais.size()) return;
@@ -125,6 +140,7 @@ public class VinculoPanel extends JPanel {
         return s.isEmpty() ? 0 : Integer.parseInt(s);
     }
 
+    /** Executa uma acao e transforma qualquer erro em mensagem na tela. */
     private void executar(Runnable acao) {
         try {
             acao.run();

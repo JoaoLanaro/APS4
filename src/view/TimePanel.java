@@ -7,7 +7,13 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * VIEW - Painel de times das abas ATUALIZAR e DELETAR.
+ * Mesmo funcionamento do JogadorPanel: tabela, formulario preenchido ao clicar numa linha,
+ * botao de acao conforme o Modo (Atualizar ou Remover) e busca por nome.
+ */
 public class TimePanel extends JPanel {
+    // Rotulos na MESMA ordem dos parametros de controller.adicionar/atualizar
     private static final String[] ROTULOS =
             {"Nome", "Pontos", "Vitórias", "Empates", "Derrotas", "Gols pró", "Gols contra"};
 
@@ -17,7 +23,7 @@ public class TimePanel extends JPanel {
     private final JTextField txtBusca = new JTextField(12);
     private final DefaultTableModel modelo;
     private final JTable tabela;
-    private int idSelecionado = 0;
+    private int idSelecionado = 0;      // id do time da linha clicada (0 = nenhum)
 
     public TimePanel(TimeController controller, Modo modo) {
         this.controller = controller;
@@ -32,6 +38,7 @@ public class TimePanel extends JPanel {
         };
         tabela = new JTable(modelo);
 
+        // Formulario: rotulo + campo, quatro pares por linha
         JPanel form = new JPanel(new GridLayout(0, 8, 6, 4));
         for (int i = 0; i < ROTULOS.length; i++) {
             campos[i] = new JTextField();
@@ -56,6 +63,7 @@ public class TimePanel extends JPanel {
         add(topo, BorderLayout.NORTH);
         add(new JScrollPane(tabela), BorderLayout.CENTER);
 
+        // Clicar numa linha -> preenche o formulario
         tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabela.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) preencherCampos();
@@ -70,13 +78,16 @@ public class TimePanel extends JPanel {
         recarregar();
     }
 
+    /** Recarrega a tabela com todos os times do banco. */
     public void recarregar() { executar(() -> preencherTabela(controller.listar())); }
 
+    /** UPDATE: envia os campos ao controller e atualiza a tabela. */
     private void atualizar() {
         controller.atualizar(idSelecionado, txt(0), num(1), num(2), num(3), num(4), num(5), num(6));
         limpar(); recarregar();
     }
 
+    /** DELETE: confirma antes de remover (os vinculos do time tambem sao apagados). */
     private void remover() {
         if (idSelecionado <= 0) throw new IllegalArgumentException("Selecione um time na tabela.");
         int r = JOptionPane.showConfirmDialog(this,
@@ -99,7 +110,7 @@ public class TimePanel extends JPanel {
         if (linha < 0) return;
         idSelecionado = (int) modelo.getValueAt(linha, 0);
         for (int i = 0; i < campos.length; i++)
-            campos[i].setText(String.valueOf(modelo.getValueAt(linha, i + 1)));
+            campos[i].setText(String.valueOf(modelo.getValueAt(linha, i + 1))); // +1: pula a coluna ID
     }
 
     private void limpar() {
@@ -116,6 +127,7 @@ public class TimePanel extends JPanel {
         return s.isEmpty() ? 0 : Integer.parseInt(s);
     }
 
+    /** Executa uma acao e transforma qualquer erro em mensagem na tela. */
     private void executar(Runnable acao) {
         try {
             acao.run();

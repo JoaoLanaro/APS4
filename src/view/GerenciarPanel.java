@@ -7,6 +7,11 @@ import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 
+/**
+ * VIEW - Conteudo das abas ATUALIZAR e DELETAR.
+ * Reune tres sub-abas (Jogadores, Times, Vinculos). O mesmo codigo serve as duas abas
+ * principais: o Modo recebido (ATUALIZAR ou REMOVER) e repassado aos tres paineis.
+ */
 public class GerenciarPanel extends JPanel {
     private final JogadorPanel jogadores;
     private final TimePanel times;
@@ -24,7 +29,7 @@ public class GerenciarPanel extends JPanel {
         abas.addTab("Times", times);
         abas.addTab("Vínculos", vinculos);
 
-        // Ao trocar de sub-aba, recarrega a que abriu
+        // Ao trocar de sub-aba, recarrega a que abriu (os dados podem ter mudado)
         abas.addChangeListener(e -> {
             Component c = abas.getSelectedComponent();
             if (c == jogadores) jogadores.recarregar();
@@ -35,7 +40,7 @@ public class GerenciarPanel extends JPanel {
         add(abas, BorderLayout.CENTER);
     }
 
-    /** Recarrega as três sub-abas (o MainFrame chama ao abrir a aba principal). */
+    /** Recarrega as tres sub-abas (o MainFrame chama ao abrir a aba principal). */
     public void recarregar() {
         jogadores.recarregar();
         times.recarregar();

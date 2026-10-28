@@ -8,11 +8,17 @@ import model.Time;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * VIEW - Aba CADASTRO (somente adicionar).
+ * Tem tres sub-abas, cada uma com um formulario: Novo jogador, Novo time e
+ * Vincular jogador a time (tabela relacional). Cada botao chama um controller.
+ */
 public class CadastroPanel extends JPanel {
     private final JogadorController jogadorController;
     private final TimeController timeController;
     private final VinculoController vinculoController;
 
+    // Combos do formulario de vinculo (preenchidos com jogadores e times do banco)
     private final JComboBox<Jogador> cbJogador = new JComboBox<>();
     private final JComboBox<Time> cbTime = new JComboBox<>();
 
@@ -26,13 +32,14 @@ public class CadastroPanel extends JPanel {
         abas.addTab("Novo jogador", criarFormJogador());
         abas.addTab("Novo time", criarFormTime());
         abas.addTab("Vincular jogador a time", criarFormVinculo());
-        abas.addChangeListener(e -> recarregarCombos());
+        abas.addChangeListener(e -> recarregarCombos());    // ao trocar de sub-aba, atualiza os combos
         add(abas, BorderLayout.CENTER);
 
         recarregarCombos();
     }
 
 
+    // ---------- Formulario: jogador ----------
     private JPanel criarFormJogador() {
         JTextField nome = new JTextField(20), idade = new JTextField(5);
         JTextField nac = new JTextField(15), pos = new JTextField(15);
@@ -51,6 +58,7 @@ public class CadastroPanel extends JPanel {
 
         JButton btn = new JButton("Cadastrar jogador");
         botao(form, 8, btn);
+        // Botao -> controller valida e grava -> limpa os campos -> avisa o usuario
         btn.addActionListener(e -> executar(() -> {
             jogadorController.adicionar(nome.getText(), num(idade), nac.getText(), pos.getText(),
                     num(gols), num(assist), num(amarelos), num(vermelhos));
@@ -61,6 +69,7 @@ public class CadastroPanel extends JPanel {
         return envolver(form);
     }
 
+    // ---------- Formulario: time ----------
     private JPanel criarFormTime() {
         JTextField nome = new JTextField(20), pontos = new JTextField(5);
         JTextField vitorias = new JTextField(5), empates = new JTextField(5), derrotas = new JTextField(5);
@@ -87,6 +96,7 @@ public class CadastroPanel extends JPanel {
         return envolver(form);
     }
 
+    // ---------- Formulario: vinculo (tabela relacional) ----------
     private JPanel criarFormVinculo() {
         JTextField camisa = new JTextField(5), partidas = new JTextField(5);
 
@@ -107,6 +117,9 @@ public class CadastroPanel extends JPanel {
         return envolver(form);
     }
 
+    // ---------- Metodos auxiliares ----------
+
+    /** Recarrega os combos de jogador e time com o que existe no banco. */
     private void recarregarCombos() {
         executar(() -> {
             cbJogador.removeAllItems();
@@ -116,6 +129,7 @@ public class CadastroPanel extends JPanel {
         });
     }
 
+    /** Adiciona um par "rotulo + componente" na linha indicada do formulario (GridBagLayout). */
     private void campo(JPanel form, int linha, String rotulo, JComponent componente) {
         GridBagConstraints g = new GridBagConstraints();
         g.gridy = linha;
@@ -125,6 +139,7 @@ public class CadastroPanel extends JPanel {
         g.gridx = 1; form.add(componente, g);
     }
 
+    /** Adiciona o botao do formulario na coluna dos campos. */
     private void botao(JPanel form, int linha, JButton btn) {
         GridBagConstraints g = new GridBagConstraints();
         g.gridx = 1; g.gridy = linha;
@@ -133,21 +148,25 @@ public class CadastroPanel extends JPanel {
         form.add(btn, g);
     }
 
+    /** Mantem o formulario no canto superior esquerdo da aba. */
     private JPanel envolver(JPanel form) { 
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.add(form);
         return p;
     }
 
+    /** Esvazia os campos de texto informados. */
     private void limpar(JTextField... campos) {
         for (JTextField c : campos) c.setText("");
     }
 
+    /** Converte o texto do campo em inteiro (vazio = 0). Texto invalido lanca NumberFormatException. */
     private int num(JTextField f) {
         String s = f.getText().trim();
         return s.isEmpty() ? 0 : Integer.parseInt(s);
     }
 
+    /** Executa uma acao e transforma qualquer erro em mensagem na tela (com o motivo, se houver). */
     private void executar(Runnable acao) {
     try {
         acao.run();

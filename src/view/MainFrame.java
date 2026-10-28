@@ -7,12 +7,21 @@ import controller.VinculoController;
 import javax.swing.*;
 import java.awt.Component;
 
+/**
+ * VIEW - Janela principal (JFrame) com as quatro abas do programa:
+ *   Consulta  -> visualizar com colunas e filtros a escolha (ConsultaPanel)
+ *   Cadastro  -> adicionar jogador, time e vinculo (CadastroPanel)
+ *   Atualizar -> editar entradas existentes (GerenciarPanel em modo ATUALIZAR)
+ *   Deletar   -> remover entradas existentes (GerenciarPanel em modo REMOVER)
+ * Recebe os controllers e os repassa aos paineis; nao conhece o banco.
+ */
 public class MainFrame extends JFrame {
 
     public MainFrame(JogadorController jc, TimeController tc, VinculoController vc, ConsultaController cc) {
         setTitle("Campeonato - Jogadores e Times");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        // Cria um painel para cada aba
         ConsultaPanel consulta = new ConsultaPanel(cc);
         CadastroPanel cadastro = new CadastroPanel(jc, tc, vc);
         GerenciarPanel abaAtualizar = new GerenciarPanel(Modo.ATUALIZAR, jc, tc, vc);
@@ -24,7 +33,7 @@ public class MainFrame extends JFrame {
         abas.addTab("Atualizar", abaAtualizar);
         abas.addTab("Deletar", abaDeletar);
 
-        // Ao abrir uma aba, mostra os dados mais recentes
+        // Ao abrir uma aba, recarrega os dados: outra aba pode ter alterado o banco
         abas.addChangeListener(e -> {
             Component c = abas.getSelectedComponent();
             if (c == consulta) consulta.atualizar();
@@ -34,6 +43,6 @@ public class MainFrame extends JFrame {
 
         add(abas);
         setSize(1000, 620);
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null);    // centraliza na tela
     }
 }
