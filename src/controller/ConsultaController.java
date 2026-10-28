@@ -6,6 +6,10 @@ import model.FiltroConsulta;
 import model.Operador;
 import java.util.List;
 
+/**
+ * CONTROLLER - Valida a configuracao da aba Consulta e entrega ao ConsultaDAO.
+ * Regras: ao menos uma coluna marcada; o filtro numerico precisa de coluna, operador e valor juntos.
+ */
 public class ConsultaController {
     private final ConsultaDAO dao;   
     public ConsultaController(ConsultaDAO dao) { this.dao = dao; }

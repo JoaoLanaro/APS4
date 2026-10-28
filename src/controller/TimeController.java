@@ -4,6 +4,10 @@ import dao.TimeDAO;
 import model.Time;
 import java.util.List;
 
+/**
+ * CONTROLLER - Valida os dados de time vindos da tela e chama o TimeDAO.
+ * Mesma estrutura do JogadorController (sem Swing, sem SQL, so a interface do DAO).
+ */
 public class TimeController {
     private final TimeDAO dao;   // interface, não DAOSQL
 
@@ -31,6 +35,7 @@ public class TimeController {
         dao.remover(id);
     }
 
+    /** Nome obrigatorio e nenhum valor negativo. */
     private Time validar(int id, String nome, int pontos, int vitorias, int empates,
                          int derrotas, int golsPro, int golsContra) {
         if (nome == null || nome.isBlank()) throw new IllegalArgumentException("Nome é obrigatório.");
